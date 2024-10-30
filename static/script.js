@@ -91,3 +91,25 @@ window.onload = function() {
     fetchAnxietyData();
 };
 
+// Breathing exercise durations (in milliseconds)
+const inhaleDuration = 4000;
+const holdDuration = 4000;
+const exhaleDuration = 4000;
+
+async function startBreathingExercise() {
+    document.getElementById("breathing-instructions").innerText = "Inhale...";
+
+    await new Promise(resolve => setTimeout(resolve, inhaleDuration));
+    document.getElementById("breathing-instructions").innerText = "Hold...";
+
+    await new Promise(resolve => setTimeout(resolve, holdDuration));
+    document.getElementById("breathing-instructions").innerText = "Exhale...";
+
+    await new Promise(resolve => setTimeout(resolve, exhaleDuration));
+    document.getElementById("breathing-instructions").innerText = "Breathing exercise complete.";
+}
+
+// Attach event listener to start the breathing exercise
+document.getElementById('startBreathingExerciseButton').addEventListener('click', startBreathingExercise);
+
+
