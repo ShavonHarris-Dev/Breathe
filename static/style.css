@@ -1,0 +1,66 @@
+:root {
+    /* Define your CSS variables for easy theming */
+    --primary-color: #007bff;
+    --primary-hover: #0056b3;
+    --background-color: #f4f4f9;
+    --container-background: #ffffff;
+    --text-color: #333333;
+    --border-color: #ccc;
+    --box-shadow-color: rgba(0, 0, 0, 0.1);
+    --font-family: Arial, sans-serif;
+}
+
+body {
+    font-family: var(--font-family);
+    padding: 20px;
+    margin: 0;
+    background-color: var(--background-color);
+}
+
+.container {
+    max-width: 600px;
+    margin: 0 auto;
+    background-color: var(--container-background);
+    padding: 20px;
+    border-radius: 8px;
+    box-shadow: 0 2px 10px var(--box-shadow-color);
+}
+
+h1 {
+    text-align: center;
+    margin-bottom: 20px;
+    color: var(--text-color);
+}
+
+label {
+    font-weight: bold;
+    color: var(--text-color);
+}
+
+input[type="range"] {
+    width: 100%;
+    margin-bottom: 10px;
+}
+
+button {
+    width: 100%;
+    padding: 10px;
+    background-color: var(--primary-color);
+    color: white;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+}
+
+button:hover {
+    background-color: var(--primary-hover);
+}
+
+#affirmation-output {
+    margin-top: 20px;
+    padding: 15px;
+    border: 1px solid var(--border-color);
+    background-color: #f9f9f9;
+    border-radius: 4px;
+}
+

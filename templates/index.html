@@ -1,0 +1,45 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Anxiety Relief App</title>
+    <!-- Link to external CSS file -->
+    <link rel="stylesheet" href="static/style.css">
+</head>
+<body>
+
+<div class="container">
+    <h1>Anxiety Relief App</h1>
+
+    <!-- Anxiety Level Check-in -->
+    <div>
+        <label for="anxietyLevel">How anxious do you feel right now?</label>
+        <input type="range" id="anxietyLevel" min="0" max="10" step="1" aria-label="Anxiety Level Slider">
+        <p>Anxiety Level: <span id="anxiety-level-value">5</span>/10</p>
+    </div>
+
+    <!-- Submit Button for Affirmation -->
+    <div>
+        <button id="getAffirmationButton">Get Positive Affirmation</button>
+    </div>
+
+    <!-- Display the Affirmation -->
+    <div id="affirmation-output" role="alert" aria-live="polite">
+        Your affirmation will appear here.
+    </div>
+    <!-- Anxiety Trends Visualization -->
+<div class="chart-container">
+    <canvas id="anxietyChart" width="400" height="200"></canvas>
+</div>
+
+</div>
+
+<!-- Link to external JavaScript file -->
+<script src="static/script.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+
+</body>
+</html>
+
