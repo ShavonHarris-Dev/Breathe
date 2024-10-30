@@ -3,6 +3,9 @@ from flask_sqlalchemy import SQLAlchemy
 from openai import OpenAI
 import os
 from dotenv import load_dotenv
+import boto3
+from flask import send_file
+
 
 # Initialize Flask app
 app = Flask(__name__)
@@ -13,6 +16,38 @@ load_dotenv()
 # Initialize OpenAI client with API key from environment
 api_key = os.getenv('OPENAI_API_KEY')
 client = OpenAI(api_key=api_key)
+
+
+
+
+# Initialize AWS Polly client using credentials from environment variables
+polly_client = boto3.Session().client('polly', 
+    region_name=os.getenv('AWS_DEFAULT_REGION'),
+    aws_access_key_id=os.getenv('AWS_ACCESS_KEY_ID'),
+    aws_secret_access_key=os.getenv('AWS_SECRET_ACCESS_KEY')
+)
+
+
+
+# Route for generating custom voice for breathing exercise
+@app.route('/breathing-voice', methods=['GET'])
+def get_breathing_voice():
+    instruction = request.args.get('instruction')  # e.g., "Inhale", "Hold", "Exhale"
+    
+    # Call AWS Polly to synthesize speech
+    response = polly_client.synthesize_speech(
+        Text=instruction,
+        OutputFormat="mp3",
+        VoiceId="Joanna"  # You can choose other voices
+    )
+
+    # Save the audio to a file
+    with open('breathing_instruction.mp3', 'wb') as f:
+        f.write(response['AudioStream'].read())
+
+    # Send the audio file to the frontend
+    return send_file('breathing_instruction.mp3', mimetype='audio/mpeg')
+
 
 
 # Serve the index.html using render_template

@@ -112,4 +112,31 @@ async function startBreathingExercise() {
 // Attach event listener to start the breathing exercise
 document.getElementById('startBreathingExerciseButton').addEventListener('click', startBreathingExercise);
 
+// Function to play voice instruction
+async function playVoiceInstruction(instruction) {
+    const audio = new Audio(`/breathing-voice?instruction=${instruction}`);
+    audio.play();
+}
+
+// Breathing exercise with voice guidance
+async function startBreathingExercise() {
+    document.getElementById("breathing-instructions").innerText = "Inhale...";
+    await playVoiceInstruction("Inhale");
+    
+    await new Promise(resolve => setTimeout(resolve, inhaleDuration));
+    document.getElementById("breathing-instructions").innerText = "Hold...";
+    await playVoiceInstruction("Hold");
+
+    await new Promise(resolve => setTimeout(resolve, holdDuration));
+    document.getElementById("breathing-instructions").innerText = "Exhale...";
+    await playVoiceInstruction("Exhale");
+
+    await new Promise(resolve => setTimeout(resolve, exhaleDuration));
+    document.getElementById("breathing-instructions").innerText = "Breathing exercise complete.";
+}
+
+// Attach event listener to start the breathing exercise
+document.getElementById('startBreathingExerciseButton').addEventListener('click', startBreathingExercise);
+
+
 
