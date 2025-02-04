@@ -77,7 +77,7 @@ def generate_affirmation():
         anxiety_level = data.get('anxietyLevel', 5)
         
         completion = client.chat.completions.create(
-            model="gpt-3.5-turbo",
+            model="gpt-4",
             messages=[
                 {"role": "system", "content": "You are a compassionate assistant specializing in anxiety management."},
                 {"role": "user", "content": f"Generate a calming affirmation for someone with anxiety level {anxiety_level}/10."}
@@ -127,7 +127,16 @@ def generate_affirmation():
 #         return jsonify(anxiety_data), 200
 #     except Exception as e:
 #         app.logger.error(f'Error fetching anxiety data: {str(e)}')
-#          return jsonify({"error": str(e)}), 500
+        #  return jsonify({"error": str(e)}), 500
+
+@app.route('/get-anxiety-data', methods=['GET'])
+def get_anxiety_data():
+    # Example data. Replace with real data from your database.
+    data = [
+        {"anxiety_level": 5, "timestamp": "2025-02-03T17:30:00Z"},
+        {"anxiety_level": 4, "timestamp": "2025-02-03T18:00:00Z"}
+    ]
+    return jsonify(data)
 
 
 

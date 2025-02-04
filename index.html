@@ -7,87 +7,108 @@
     <link rel="stylesheet" href="public/style.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/4.1.1/animate.min.css">
     <link href="https://fonts.googleapis.com/css2?family=Quicksand:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
-    <script src="/public/script.js"></script>
 </head>
 <body>
+    <!-- Animated Background -->
     <div class="bg-animation"></div>
-    <div class="container glass-effect">
-        <header class="app-header">
-            <h1 class="animate__animated animate__fadeIn">Mindful Moments</h1>
-            <p class="tagline">Your personal space for peace and calm</p>
-        </header>
 
-        <main>
-            <!-- Anxiety Level Check-in -->
-            <section class="check-in-section animate__animated animate__fadeInUp">
-                <h2>Daily Check-in</h2>
-                <div class="mood-tracker">
-                    <label for="anxietyLevel">How are you feeling right now?</label>
-                    <div class="slider-container">
-                        <span class="emoji">😌</span>
-                        <input type="range" id="anxietyLevel" min="0" max="10" step="1" 
-                               aria-label="Anxiety Level Slider" class="custom-slider">
-                        <span class="emoji">😰</span>
-                    </div>
-                    <p class="level-indicator">Anxiety Level: <span id="anxiety-level-value" class="highlight">5</span>/10</p>
-                </div>
-            </section>
+    <!-- Hero Section with Particle Animation -->
+    <section class="hero">
+        <div class="particle-container" id="hero-particles"></div>
+        <h1>Find Your Peace</h1>
+        <p class="hero-text">A mindful journey to calmness and clarity</p>
+    </section>
 
-            <!-- Breathing Exercise Section -->
-            <!-- <section class="breathing-exercise animate__animated animate__fadeInUp">
-                <h2>Breathing Space</h2>
-                <div class="breathing-circle" id="breathingCircle">
-                    <div class="circle-inner"></div>
+    <!-- Main Content -->
+    <div class="scroll-container">
+        <!-- Mood Check-in Card -->
+        <section class="card mood-card glass-effect">
+            <h2>How are you feeling?</h2>
+            <div class="mood-slider">
+                <label for="anxietyLevel">Anxiety Level</label>
+                <div class="slider-wrapper">
+                    <span>😌</span>
+                    <input type="range" id="anxietyLevel" min="1" max="10" value="5">
+                    <span>😰</span>
                 </div>
-                <button id="startBreathingExerciseButton" class="primary-button">
-                    <span class="button-icon">🫁</span>
-                    Begin Breathing Exercise
-                </button>
-                <p id="breathing-instructions" class="breathing-text">Follow the guidance to inhale, hold, and exhale.</p>
-            </section> -->
-            <section class="breathing-exercise animate__animated animate__fadeInUp">
-                <h2>Breathing Space</h2>
-                <!-- Container for Three.js visualization -->
-                <div id="breathing-container" style="width:100%; height:300px;"></div>
-                <button id="startBreathingExerciseButton" class="primary-button">
-                  <span class="button-icon">🫁</span>
-                  Begin Breathing Exercise
-                </button>
+                <div class="anxiety-value">
+                    Level: <span id="anxiety-level-value">5</span>
+                </div>
+            </div>
+            <button id="getAffirmationButton" class="primary-button">
+                Get Your Affirmation
+            </button>
+            <div id="affirmation-output" class="affirmation-box glass-effect">
+                <div class="affirmation-status">
+                    <div class="pulse-dot"></div>
+                    AI is ready to support you
+                </div>
+                <p class="affirmation-text">Your personalized affirmation will appear here...</p>
+                <small class="affirmation-note">Based on your current anxiety level</small>
+            </div>
+        </section>
+
+        <!-- Breathing Exercise Card -->
+        <section class="card breathing-card glass-effect">
+            <h2>Breathing Space</h2>
+            <div class="breathing-exercise">
+                <div id="breathing-container"></div>
                 <p id="breathing-instructions" class="breathing-text">
-                  Follow the guidance to inhale, hold, and exhale.
+                    Ready to begin your breathing exercise?
                 </p>
-              </section>
-
-            <!-- Affirmation Section -->
-            <section class="affirmation-section animate__animated animate__fadeInUp">
-                <h2>Daily Affirmation</h2>
-                <button id="getAffirmationButton" class="secondary-button">
-                    <span class="button-icon">✨</span>
-                    Receive Your Affirmation
-                </button>
-                <div id="affirmation-output" class="affirmation-card" role="alert" aria-live="polite">
-                    Your affirmation will appear here.
+                <div class="breathing-controls">
+                    <button id="startBreathingExerciseButton" class="primary-button">
+                        Start Breathing Exercise
+                    </button>
+                    <button id="endBreathingExerciseButton" class="secondary-button">
+                        End Exercise
+                    </button>
                 </div>
-            </section>
+            </div>
+        </section>
 
-            <!-- Anxiety Trends Visualization -->
-            <section class="chart-section animate__animated animate__fadeInUp">
-                <h2>Your Journey</h2>
-                <div class="chart-container">
-                    <canvas id="anxietyChart" width="400" height="200"></canvas>
+        <!-- Progress Tracking Card -->
+        <section class="card progress-card glass-effect">
+            <h2>Your Journey</h2>
+            <div class="chart-container">
+                <canvas id="anxietyChart"></canvas>
+            </div>
+            <div class="stats-grid">
+                <div class="stat-box">
+                    <h3>Practice Streak</h3>
+                    <p>7 days</p>
                 </div>
-            </section>
-        </main>
-
-        <footer class="app-footer">
-            <p>Remember: Every breath is a fresh start ✨</p>
-        </footer>
+                <div class="stat-box">
+                    <h3>Minutes Mindful</h3>
+                    <p>143</p>
+                </div>
+                <div class="stat-box">
+                    <h3>Mood Trend</h3>
+                    <p>Improving</p>
+                </div>
+            </div>
+        </section>
     </div>
 
+    <!-- Quick Access Menu -->
+    <nav class="quick-menu glass-effect">
+        <button class="menu-item active" data-section="mood">
+            <span class="icon">🌟</span>
+            <span class="label">Mood</span>
+        </button>
+        <button class="menu-item" data-section="breathing">
+            <span class="icon">🌊</span>
+            <span class="label">Breathe</span>
+        </button>
+        <button class="menu-item" data-section="progress">
+            <span class="icon">📈</span>
+            <span class="label">Progress</span>
+        </button>
+    </nav>
+
     <!-- Scripts -->
-    <!-- <script src="https://cdn.jsdelivr.net/npm/chart.js"></script> -->
-    <script src="/public/script.js"></script>
+    <script src="public/script.js"></script>
 </body>
 </html>
-
