@@ -1,21 +1,28 @@
-from flask import Flask, jsonify, request, render_template
-from flask_sqlalchemy import SQLAlchemy
-# from openai import OpenAI
+from flask import Flask, jsonify, request, send_from_directory
+# from flask_sqlalchemy import SQLAlchemy
+import openai
 import os
 from dotenv import load_dotenv
 import boto3
 from flask import send_file
+import logging
 
 
 # Initialize Flask app
-app = Flask(__name__)
+app = Flask(__name__, static_url_path='/public', static_folder='public')
 # Load environment variables from .env
 load_dotenv()
 
 
+#set up logging
+logging.basicConfig(level=logging.DEBUG)
+logger = logging.getLogger(__name__)
+
+
 # Initialize OpenAI client with API key from environment
-# api_key = os.getenv('OPENAI_API_KEY')
-# client = OpenAI(api_key=api_key)
+api_key = os.getenv('OPENAI_API_KEY')
+client = openai.OpenAI(api_key=api_key)
+
 
 
 
@@ -30,9 +37,9 @@ load_dotenv()
 
 
 # Route for generating custom voice for breathing exercise
-@app.route('/breathing-voice', methods=['GET'])
-def get_breathing_voice():
-    instruction = request.args.get('instruction')  # e.g., "Inhale", "Hold", "Exhale"
+# @app.route('/breathing-voice', methods=['GET'])
+# def get_breathing_voice():
+#     instruction = request.args.get('instruction')  # e.g., "Inhale", "Hold", "Exhale"
     
     # Call AWS Polly to synthesize speech
     # response = polly_client.synthesize_speech(
@@ -50,69 +57,79 @@ def get_breathing_voice():
 
 
 
-# Serve the index.html using render_template
+# Serve the index.html using send_from_directory
 @app.route('/')
 def home():
-    return render_template('index.html')
+    try:
+        app.logger.info('Serving index.html')
+        return send_from_directory(os.path.dirname(os.path.abspath(__file__)), 'index.html')
+    except Exception as e:
+        app.logger.error(f'Error serving index.html: {str(e)}')
+        return jsonify({"error": str(e)}), 500
 
 
 # Route for AI-powered affirmation
 @app.route('/generate-affirmation', methods=['POST'])
 def generate_affirmation():
-    data = request.get_json()
-    anxiety_level = data.get('anxietyLevel', 5)  # Default to 5 if not provided
-    
-    # Prompt for OpenAI
-    prompt = f"Generate a calming affirmation for someone with anxiety level {anxiety_level}/10."
-    
-    # Call to OpenAI API
-    # try:
-    #     completion = client.chat.completions.create(
-    #         model="gpt-3.5-turbo",  # or gpt-4o-mini if valid
-    #         messages=[
-    #             {"role": "system", "content": "You are a helpful assistant."},
-    #             {"role": "user", "content": prompt}
-    #         ]
-    #     )
+    try:
+        app.logger.info('Received affirmation request')
+        data = request.get_json()
+        anxiety_level = data.get('anxietyLevel', 5)
         
-    #     # Access the content properly via .message.content in the new client
-    #     affirmation = completion.choices[0].message.content.strip()
-    #     return jsonify({"affirmation": affirmation}), 200
-    # except Exception as e:
-    #     return jsonify({"error": str(e)}), 500
+        completion = client.chat.completions.create(
+            model="gpt-3.5-turbo",
+            messages=[
+                {"role": "system", "content": "You are a compassionate assistant specializing in anxiety management."},
+                {"role": "user", "content": f"Generate a calming affirmation for someone with anxiety level {anxiety_level}/10."}
+            ]
+        )
+        
+        affirmation = completion.choices[0].message.content.strip()
+        app.logger.info(f'Generated affirmation: {affirmation}')
+        return jsonify({"affirmation": affirmation}), 200
+    except Exception as e:
+        app.logger.error(f'Error generating affirmation: {str(e)}')
+        return jsonify({"error": str(e)}), 500
 
 
 # Set up the database
-app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///anxiety.db'  # or use PostgreSQL for production
-db = SQLAlchemy(app)
+# app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///anxiety.db'  # or use PostgreSQL for production
+# db = SQLAlchemy(app)
 
 # Define an Anxiety model
-class AnxietyLog(db.Model):
-    id = db.Column(db.Integer, primary_key=True)
-    anxiety_level = db.Column(db.Integer, nullable=False)
-    timestamp = db.Column(db.DateTime, default=db.func.current_timestamp())
+# class AnxietyLog(db.Model):
+#     id = db.Column(db.Integer, primary_key=True)
+#     anxiety_level = db.Column(db.Integer, nullable=False)
+#     timestamp = db.Column(db.DateTime, default=db.func.current_timestamp())
 
 # Route to log anxiety levels
-@app.route('/log-anxiety', methods=['POST'])
-def log_anxiety():
-    data = request.get_json()
-    anxiety_level = data.get('anxietyLevel')
+# @app.route('/log-anxiety', methods=['POST'])
+# def log_anxiety():
+#     data = request.get_json()
+#     anxiety_level = data.get('anxietyLevel')
     
-    if anxiety_level is None:
-        return jsonify({"message": "Anxiety level not provided"}), 400
+#     if anxiety_level is None:
+#         return jsonify({"message": "Anxiety level not provided"}), 400
 
-    # Log anxiety level
-    new_log = AnxietyLog(anxiety_level=anxiety_level)
-    db.session.add(new_log)
-    db.session.commit()
+#     # Log anxiety level
+#     new_log = AnxietyLog(anxiety_level=anxiety_level)
+#     db.session.add(new_log)
+#     db.session.commit()
 
-    return jsonify({"message": f"Anxiety level {anxiety_level}/10 logged successfully"}), 200
+#     return jsonify({"message": f"Anxiety level {anxiety_level}/10 logged successfully"}), 200
 
-@app.route('/get-anxiety-data', methods=['GET'])
-def get_anxiety_data():
-    logs = AnxietyLog.query.order_by(AnxietyLog.timestamp).all()
-    anxiety_data = [{"anxiety_level": log.anxiety_level, "timestamp": log.timestamp} for log in logs]
-    return jsonify(anxiety_data), 200
+# @app.route('/get-anxiety-data', methods=['GET'])
+# def get_anxiety_data():
+#     app.logger.info('Received request for anxiety data')
+#     try:
+#         logs = AnxietyLog.query.order_by(AnxietyLog.timestamp).all()
+#         anxiety_data = [{"anxiety_level": log.anxiety_level, "timestamp": log.timestamp} for log in logs]
+#         return jsonify(anxiety_data), 200
+#     except Exception as e:
+#         app.logger.error(f'Error fetching anxiety data: {str(e)}')
+#          return jsonify({"error": str(e)}), 500
+
+
 
 
 
