@@ -1,5 +1,5 @@
 from flask import Flask, jsonify, request, send_from_directory
-# from flask_sqlalchemy import SQLAlchemy
+from flask_sqlalchemy import SQLAlchemy
 import openai
 import os
 from dotenv import load_dotenv
@@ -57,6 +57,21 @@ client = openai.OpenAI(api_key=api_key)
 
 
 
+# Database configuration and initialization
+app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///anxiety.db'
+app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
+db = SQLAlchemy(app)
+
+# Define the AnxietyLog model
+class AnxietyLog(db.Model):
+    id = db.Column(db.Integer, primary_key=True)
+    anxiety_level = db.Column(db.Integer, nullable=False)
+    timestamp = db.Column(db.DateTime, default=db.func.current_timestamp())
+
+# Create the database tables if they don't exist
+with app.app_context():
+    db.create_all()
+
 # Serve the index.html using send_from_directory
 @app.route('/')
 def home():
@@ -66,7 +81,6 @@ def home():
     except Exception as e:
         app.logger.error(f'Error serving index.html: {str(e)}')
         return jsonify({"error": str(e)}), 500
-
 
 # Route for AI-powered affirmation
 @app.route('/generate-affirmation', methods=['POST'])
@@ -91,59 +105,38 @@ def generate_affirmation():
         app.logger.error(f'Error generating affirmation: {str(e)}')
         return jsonify({"error": str(e)}), 500
 
-
-# Set up the database
-# app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///anxiety.db'  # or use PostgreSQL for production
-# db = SQLAlchemy(app)
-
-# Define an Anxiety model
-# class AnxietyLog(db.Model):
-#     id = db.Column(db.Integer, primary_key=True)
-#     anxiety_level = db.Column(db.Integer, nullable=False)
-#     timestamp = db.Column(db.DateTime, default=db.func.current_timestamp())
-
 # Route to log anxiety levels
-# @app.route('/log-anxiety', methods=['POST'])
-# def log_anxiety():
-#     data = request.get_json()
-#     anxiety_level = data.get('anxietyLevel')
+@app.route('/log-anxiety', methods=['POST'])
+def log_anxiety():
+    data = request.get_json()
+    anxiety_level = data.get('anxietyLevel')
     
-#     if anxiety_level is None:
-#         return jsonify({"message": "Anxiety level not provided"}), 400
+    if anxiety_level is None:
+        return jsonify({"message": "Anxiety level not provided"}), 400
 
-#     # Log anxiety level
-#     new_log = AnxietyLog(anxiety_level=anxiety_level)
-#     db.session.add(new_log)
-#     db.session.commit()
+    try:
+        new_log = AnxietyLog(anxiety_level=anxiety_level)
+        db.session.add(new_log)
+        db.session.commit()
+        return jsonify({"message": f"Anxiety level {anxiety_level}/10 logged successfully"}), 200
+    except Exception as e:
+        app.logger.error(f'Error logging anxiety: {str(e)}')
+        return jsonify({"error": "Internal server error"}), 500
 
-#     return jsonify({"message": f"Anxiety level {anxiety_level}/10 logged successfully"}), 200
-
-# @app.route('/get-anxiety-data', methods=['GET'])
-# def get_anxiety_data():
-#     app.logger.info('Received request for anxiety data')
-#     try:
-#         logs = AnxietyLog.query.order_by(AnxietyLog.timestamp).all()
-#         anxiety_data = [{"anxiety_level": log.anxiety_level, "timestamp": log.timestamp} for log in logs]
-#         return jsonify(anxiety_data), 200
-#     except Exception as e:
-#         app.logger.error(f'Error fetching anxiety data: {str(e)}')
-        #  return jsonify({"error": str(e)}), 500
-
+# Route to retrieve anxiety data from the database
 @app.route('/get-anxiety-data', methods=['GET'])
 def get_anxiety_data():
-    # Example data. Replace with real data from your database.
-    data = [
-        {"anxiety_level": 5, "timestamp": "2025-02-03T17:30:00Z"},
-        {"anxiety_level": 4, "timestamp": "2025-02-03T18:00:00Z"}
-    ]
-    return jsonify(data)
-
-
-
-
+    try:
+        logs = AnxietyLog.query.order_by(AnxietyLog.timestamp).all()
+        anxiety_data = [{
+            "anxiety_level": log.anxiety_level,
+            "timestamp": log.timestamp.isoformat()
+        } for log in logs]
+        return jsonify(anxiety_data), 200
+    except Exception as e:
+        app.logger.error(f'Error fetching anxiety data: {str(e)}')
+        return jsonify({"error": str(e)}), 500
 
 # Run the app
 if __name__ == '__main__':
     app.run(debug=True)
-
-

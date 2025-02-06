@@ -1,5 +1,19 @@
 // Make sure the DOM is loaded
 window.addEventListener('DOMContentLoaded', () => {
+
+    const calmingMusic = new Audio('public/calming-music.mp3');
+    calmingMusic.loop = true;
+    calmingMusic.volume = 0.5; // Adjust volume as needed
+    
+    window.addEventListener('scroll', function startMusicOnScroll() {
+        calmingMusic.play()
+            .then(() => {
+                console.log("Music started on scroll");
+                window.removeEventListener('scroll', startMusicOnScroll);
+            })
+            .catch(error => console.error('Error starting music on scroll:', error));
+    });
+
     // ParticleBreathing class definition
     class ParticleBreathing {
         constructor(containerId) {
@@ -166,6 +180,10 @@ window.addEventListener('DOMContentLoaded', () => {
         }
     }
 
+
+
+    
+
     // AI and Anxiety Tracking Functions
     async function fetchAffirmation() {
         const anxietyLevel = document.getElementById("anxietyLevel").value;
@@ -307,6 +325,54 @@ window.addEventListener('DOMContentLoaded', () => {
             anxietyLevelValue.textContent = this.value;
         }
     }
+// Function to log anxiety and print a console message with today's timestamp
+async function logAnxiety() {
+    const anxietySlider = document.getElementById('anxietyLevel');
+    const level = anxietySlider.value;
+    try {
+        const response = await fetch('/log-anxiety', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ anxietyLevel: level })
+        });
+        const data = await response.json();
+        if (response.ok) {
+            console.log(`Logged anxiety level ${level} at ${new Date().toLocaleString()}`);
+        } else {
+            console.error('Error logging anxiety:', data.error);
+        }
+    } catch (error) {
+        console.error('Error logging anxiety:', error);
+    }
+}
+
+// Function to fetch and update anxiety data in the chart
+async function fetchAnxietyData() {
+    try {
+        const response = await fetch('/get-anxiety-data');
+        const data = await response.json();
+        if (response.ok) {
+            // Assumed updateChart() function exists that updates your Chart.js chart
+            const anxietyLevels = data.map(log => log.anxiety_level);
+            const timestamps = data.map(log => new Date(log.timestamp).toLocaleString());
+            updateChart(anxietyLevels, timestamps);
+        } else {
+            console.error("Error fetching anxiety data:", data.error);
+        }
+    } catch (error) {
+        console.error("Error fetching anxiety data:", error);
+    }
+}
+
+// Attach event listener for anxiety slider change
+if (anxietySlider && anxietyLevelValue) {
+    anxietySlider.addEventListener('change', () => {
+        anxietyLevelValue.textContent = anxietySlider.value;
+        logAnxiety();         // Log new anxiety level
+        fetchAnxietyData();   // Refresh chart with updated data
+    });
+}
+
 
     // Initialize anxiety data
     fetchAnxietyData();
