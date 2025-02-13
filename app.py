@@ -13,6 +13,19 @@ app = Flask(__name__, static_url_path='/public', static_folder='public')
 # Load environment variables from .env
 load_dotenv()
 
+# Add MIME type handling
+@app.route('/public/<path:filename>')
+def serve_static(filename):
+    mime_types = {
+        '.jsx': 'text/babel',
+        '.js': 'application/javascript',
+        '.css': 'text/css',
+        '.html': 'text/html'
+    }
+    file_ext = os.path.splitext(filename)[1]
+    mimetype = mime_types.get(file_ext, None)
+    return send_from_directory('public', filename, mimetype=mimetype)
+
 
 #set up logging
 logging.basicConfig(level=logging.DEBUG)

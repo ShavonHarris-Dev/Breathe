@@ -1,4 +1,5 @@
 // Make sure the DOM is loaded
+
 window.addEventListener('DOMContentLoaded', () => {
 
     const calmingMusic = new Audio('public/calming-music.mp3');

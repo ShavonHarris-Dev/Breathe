@@ -9,7 +9,6 @@
     <link href="https://fonts.googleapis.com/css2?family=Quicksand:wght@300;400;500;600;700&display=swap" rel="stylesheet">
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
-</head>
 <body>
     <!-- Animated Background -->
     <div class="bg-animation"></div>
@@ -43,7 +42,7 @@
             <div id="affirmation-output" class="affirmation-box glass-effect">
                 <div class="affirmation-status">
                     <div class="pulse-dot"></div>
-                    AI is ready to support you
+                    Fantasia is ready to support you
                 </div>
                 <p class="affirmation-text">Your personalized affirmation will appear here...</p>
                 <small class="affirmation-note">Based on your current anxiety level</small>
@@ -92,7 +91,7 @@
         </section>
     </div>
 
-    <!-- Quick Access Menu -->
+    <!-- Quick Access Menu
     <nav class="quick-menu glass-effect">
         <button class="menu-item active" data-section="mood">
             <span class="icon">🌟</span>
@@ -106,9 +105,21 @@
             <span class="icon">📈</span>
             <span class="label">Progress</span>
         </button>
-    </nav>
+    </nav> -->
 
-    <!-- Scripts -->
-    <script src="public/script.js"></script>
+    <!-- Journal and Sketch Card -->
+<section class="card journal-sketch-card glass-effect">
+    <div id="journal-sketch-root"></div>
+</section>
+
+      <!-- Add React CDN links before your closing body tag -->
+<!-- Scripts -->
+<script src="public/script.js"></script>
+    
+<!-- React Scripts -->
+<script src="https://cdnjs.cloudflare.com/ajax/libs/react/18.2.0/umd/react.production.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/react-dom/18.2.0/umd/react-dom.production.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/babel-standalone/7.23.5/babel.min.js"></script>
+<script type="text/babel" src="public/JournalAndSketch.jsx"></script>
 </body>
 </html>
